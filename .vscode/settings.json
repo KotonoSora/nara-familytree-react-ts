@@ -9,12 +9,18 @@
     "commitlint",
     "cssnano",
     "embla",
+    "familytree",
+    "gumroad",
+    "Hono",
     "ianvs",
+    "invertocat",
     "isbot",
-    "kotonosora",
     "lockb",
+    "njsproj",
+    "ntvs",
     "nums",
     "nvmrc",
+    "pomodoro",
     "scannerwork",
     "shadcn",
     "sonarqube",
@@ -24,6 +30,7 @@
     "tsbuildinfo",
     "vaul",
     "vite",
-    "vitest"
+    "vitest",
+    "yarnrc"
   ]
 }

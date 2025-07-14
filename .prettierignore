@@ -5,6 +5,10 @@
 !package.json
 !vite.config.ts
 !vitest.config.ts
+!worker-configuration.d.ts
+!wrangler.jsonc
+!README.md
+!CHANGELOG.md
 
 # Allow folder .vscode
 !.vscode/
@@ -15,3 +19,7 @@
 !app/**
 !workers/
 !workers/**
+!docs/
+!docs/**
+!database/
+!database/**

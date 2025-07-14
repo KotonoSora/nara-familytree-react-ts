@@ -4,7 +4,7 @@ import { HTTPException } from "hono/http-exception";
 import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
 
-const app = new Hono<{ Bindings: CloudflareEnvironment }>();
+const app = new Hono<{ Bindings: Env }>();
 
 // Middleware
 app.use("*", logger()); // Request logging
@@ -33,7 +33,7 @@ app.notFound((c) => c.json({ error: "Not Found" }, 404));
 
 // Routes
 app.get("/", (c) => {
-  const env = c.env.VALUE_FROM_CLOUDFLARE;
+  const env = import.meta.env;
   return c.json({ message: `Hello from Hono! Running in API`, env });
 });
 
