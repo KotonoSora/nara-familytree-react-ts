@@ -1,18 +1,16 @@
 {
-    "$schema": "node_modules/wrangler/config-schema.json",
-    "name": "my-worker",
-    "compatibility_date": "2025-04-09",
-    "compatibility_flags": ["nodejs_compat"],
-    "main": "./workers/app.ts",
-    "vars": {
-        "VALUE_FROM_CLOUDFLARE": "Hello from Cloudflare"
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "nara-vite-react-boilerplate",
+  "compatibility_date": "2025-04-09",
+  "compatibility_flags": ["nodejs_compat"],
+  "main": "./workers/app.ts",
+  "preview_urls": false,
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "your-database-name",
+      "database_id": "your-database-id",
+      "migrations_dir": "drizzle",
     },
-    "d1_databases": [
-        {
-            "binding": "DB",
-            "database_name": "your-database-name",
-            "database_id": "your-database-id",
-            "migrations_dir": "drizzle"
-        }
-    ]
+  ],
 }

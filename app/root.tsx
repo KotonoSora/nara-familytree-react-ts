@@ -20,9 +20,18 @@ import type { Route } from "./+types/root";
 import { Toaster } from "~/components/ui/sonner";
 import { themeSessionResolver } from "~/sessions.server";
 
-import "./app.css";
+import "~/app.css";
 
-export const links: Route.LinksFunction = () => [];
+export const links: Route.LinksFunction = () => [
+  {
+    rel: "preload",
+    href: "/fonts/Inter.woff2",
+    as: "font",
+    type: "font/woff2",
+    crossOrigin: "anonymous",
+  },
+  { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+];
 
 export async function loader({ request }: Route.LoaderArgs) {
   const { getTheme } = await themeSessionResolver(request);
@@ -41,7 +50,7 @@ function InnerLayout({
   const [theme] = useTheme();
 
   return (
-    <html lang="en" className={clsx(theme)}>
+    <html lang="en" className={clsx("font-sans", theme)}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
