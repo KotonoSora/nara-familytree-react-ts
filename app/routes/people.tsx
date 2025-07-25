@@ -31,12 +31,19 @@ export function meta({}: Route.MetaArgs) {
 
 export async function loader({ context }: Route.LoaderArgs) {
   try {
-    // In a real app, we'd fetch from the API
-    // For now, return empty data since we don't have the API running yet
-    return { people: [] as Person[] };
+    // Fetch people from the API
+    const response = await fetch(`${context.env.API_URL || 'http://localhost:8787'}/api/people`);
+    
+    if (!response.ok) {
+      console.error("Failed to fetch people:", response.status, response.statusText);
+      return { people: [] as Person[], error: "Failed to load people" };
+    }
+    
+    const data = await response.json();
+    return { people: data.data as Person[] };
   } catch (error) {
     console.error("Error loading people:", error);
-    return { people: [] as Person[] };
+    return { people: [] as Person[], error: "Failed to load people" };
   }
 }
 
@@ -50,7 +57,7 @@ function formatDate(dateString?: string) {
 }
 
 export default function PeoplePage() {
-  const { people } = useLoaderData<typeof loader>();
+  const { people, error } = useLoaderData<typeof loader>();
 
   return (
     <div className="px-4 py-8">
@@ -70,6 +77,12 @@ export default function PeoplePage() {
           </Link>
         </Button>
       </div>
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
+          {error}
+        </div>
+      )}
 
       {people.length === 0 ? (
         <div className="text-center py-12">

@@ -39,7 +39,7 @@ export default function Page({}: Route.ComponentProps) {
       icon: Network,
       title: "Relationships",
       description: "Define and manage family relationships between members.",
-      link: "/people",
+      link: "/relationships",
       linkText: "Manage",
     },
   ];

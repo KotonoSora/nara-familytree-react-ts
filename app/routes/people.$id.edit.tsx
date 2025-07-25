@@ -1,6 +1,6 @@
-import type { Route } from "./+types/people.new";
-import { Form, Link, redirect, useActionData } from "react-router";
-import { ArrowLeft, Save } from "lucide-react";
+import type { Route } from "./+types/people.$id.edit";
+import { Form, Link, redirect, useActionData, useLoaderData } from "react-router";
+import { ArrowLeft, Save, Trash } from "lucide-react";
 
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
@@ -9,16 +9,82 @@ import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
 
-export function meta({}: Route.MetaArgs) {
+type Person = {
+  id: number;
+  firstName: string;
+  lastName: string;
+  middleName?: string;
+  gender?: "male" | "female" | "other";
+  birthDate?: string;
+  deathDate?: string;
+  birthPlace?: string;
+  bio?: string;
+  profileImage?: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export function meta({ data }: Route.MetaArgs) {
+  const person = data?.person;
+  const name = person ? `${person.firstName} ${person.lastName}` : "Person";
   return [
-    { title: "Add Person - Family Tree" },
-    { name: "description", content: "Add a new family member" },
+    { title: `Edit ${name} - Family Tree` },
+    { name: "description", content: `Edit details for ${name}` },
   ];
 }
 
-export async function action({ request, context }: Route.ActionArgs) {
+export async function loader({ params, context }: Route.LoaderArgs) {
+  const personId = params.id;
+
+  try {
+    // Fetch person from the API
+    const response = await fetch(`${context.env.API_URL || 'http://localhost:8787'}/api/people/${personId}`);
+    
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Response("Person not found", { status: 404 });
+      }
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    return { person: data.data as Person };
+  } catch (error) {
+    if (error instanceof Response) {
+      throw error;
+    }
+    console.error("Error loading person:", error);
+    throw new Response("Failed to load person", { status: 500 });
+  }
+}
+
+export async function action({ request, params, context }: Route.ActionArgs) {
+  const personId = params.id;
   const formData = await request.formData();
-  
+  const intent = formData.get("intent") as string;
+
+  if (intent === "delete") {
+    try {
+      // Delete the person
+      const response = await fetch(`${context.env.API_URL || 'http://localhost:8787'}/api/people/${personId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      // Redirect to people list
+      return redirect("/people");
+    } catch (error) {
+      console.error("Error deleting person:", error);
+      return {
+        error: error instanceof Error ? error.message : "Failed to delete person. Please try again.",
+      };
+    }
+  }
+
+  // Update person
   const personData = {
     firstName: formData.get("firstName") as string,
     lastName: formData.get("lastName") as string,
@@ -39,9 +105,9 @@ export async function action({ request, context }: Route.ActionArgs) {
   }
 
   try {
-    // Call the API to create the person
-    const response = await fetch(`${context.env.API_URL || 'http://localhost:8787'}/api/people`, {
-      method: 'POST',
+    // Call the API to update the person
+    const response = await fetch(`${context.env.API_URL || 'http://localhost:8787'}/api/people/${personId}`, {
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
@@ -54,36 +120,39 @@ export async function action({ request, context }: Route.ActionArgs) {
     }
 
     const result = await response.json();
-    console.log("Person created successfully:", result.data);
+    console.log("Person updated successfully:", result.data);
     
-    // Redirect to people list
-    return redirect("/people");
+    // Redirect to person detail page
+    return redirect(`/people/${personId}`);
   } catch (error) {
-    console.error("Error creating person:", error);
+    console.error("Error updating person:", error);
     return {
-      error: error instanceof Error ? error.message : "Failed to create person. Please try again.",
+      error: error instanceof Error ? error.message : "Failed to update person. Please try again.",
       values: personData,
     };
   }
 }
 
-export default function NewPersonPage() {
+export default function EditPersonPage() {
+  const { person } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
+
+  const fullName = `${person.firstName} ${person.middleName ? `${person.middleName} ` : ''}${person.lastName}`;
 
   return (
     <div className="px-4 py-8 max-w-2xl mx-auto">
       <div className="mb-8">
         <Button asChild variant="ghost" className="mb-4">
-          <Link to="/people">
+          <Link to={`/people/${person.id}`}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to People
+            Back to {fullName}
           </Link>
         </Button>
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          Add Family Member
+          Edit Family Member
         </h1>
         <p className="text-gray-600 dark:text-gray-300">
-          Add a new person to your family tree
+          Update information for {fullName}
         </p>
       </div>
 
@@ -91,7 +160,7 @@ export default function NewPersonPage() {
         <CardHeader>
           <CardTitle>Personal Information</CardTitle>
           <CardDescription>
-            Enter the basic information for the new family member
+            Update the information for this family member
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -109,7 +178,7 @@ export default function NewPersonPage() {
                   id="firstName"
                   name="firstName"
                   required
-                  defaultValue={actionData?.values?.firstName || ""}
+                  defaultValue={actionData?.values?.firstName || person.firstName}
                   placeholder="Enter first name"
                 />
               </div>
@@ -119,7 +188,7 @@ export default function NewPersonPage() {
                   id="lastName"
                   name="lastName"
                   required
-                  defaultValue={actionData?.values?.lastName || ""}
+                  defaultValue={actionData?.values?.lastName || person.lastName}
                   placeholder="Enter last name"
                 />
               </div>
@@ -130,14 +199,14 @@ export default function NewPersonPage() {
               <Input
                 id="middleName"
                 name="middleName"
-                defaultValue={actionData?.values?.middleName || ""}
+                defaultValue={actionData?.values?.middleName || person.middleName || ""}
                 placeholder="Enter middle name (optional)"
               />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="gender">Gender</Label>
-              <Select name="gender" defaultValue={actionData?.values?.gender || ""}>
+              <Select name="gender" defaultValue={actionData?.values?.gender || person.gender || ""}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select gender (optional)" />
                 </SelectTrigger>
@@ -156,7 +225,7 @@ export default function NewPersonPage() {
                   id="birthDate"
                   name="birthDate"
                   type="date"
-                  defaultValue={actionData?.values?.birthDate || ""}
+                  defaultValue={actionData?.values?.birthDate || person.birthDate || ""}
                 />
               </div>
               <div className="space-y-2">
@@ -165,7 +234,7 @@ export default function NewPersonPage() {
                   id="deathDate"
                   name="deathDate"
                   type="date"
-                  defaultValue={actionData?.values?.deathDate || ""}
+                  defaultValue={actionData?.values?.deathDate || person.deathDate || ""}
                 />
               </div>
             </div>
@@ -175,7 +244,7 @@ export default function NewPersonPage() {
               <Input
                 id="birthPlace"
                 name="birthPlace"
-                defaultValue={actionData?.values?.birthPlace || ""}
+                defaultValue={actionData?.values?.birthPlace || person.birthPlace || ""}
                 placeholder="Enter birth place (optional)"
               />
             </div>
@@ -185,20 +254,39 @@ export default function NewPersonPage() {
               <Textarea
                 id="bio"
                 name="bio"
-                defaultValue={actionData?.values?.bio || ""}
+                defaultValue={actionData?.values?.bio || person.bio || ""}
                 placeholder="Enter biographical information (optional)"
                 rows={4}
               />
             </div>
 
-            <div className="flex justify-end space-x-3">
-              <Button type="button" variant="outline" asChild>
-                <Link to="/people">Cancel</Link>
-              </Button>
-              <Button type="submit">
-                <Save className="h-4 w-4 mr-2" />
-                Save Person
-              </Button>
+            <div className="flex justify-between items-center pt-6 border-t">
+              <Form method="post">
+                <input type="hidden" name="intent" value="delete" />
+                <Button 
+                  type="submit" 
+                  variant="destructive" 
+                  size="sm"
+                  onClick={(e) => {
+                    if (!confirm("Are you sure you want to delete this person? This action cannot be undone.")) {
+                      e.preventDefault();
+                    }
+                  }}
+                >
+                  <Trash className="h-4 w-4 mr-2" />
+                  Delete Person
+                </Button>
+              </Form>
+
+              <div className="flex space-x-3">
+                <Button type="button" variant="outline" asChild>
+                  <Link to={`/people/${person.id}`}>Cancel</Link>
+                </Button>
+                <Button type="submit">
+                  <Save className="h-4 w-4 mr-2" />
+                  Save Changes
+                </Button>
+              </div>
             </div>
           </Form>
         </CardContent>

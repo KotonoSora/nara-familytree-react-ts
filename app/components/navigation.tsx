@@ -1,11 +1,12 @@
 import { NavLink } from "react-router";
-import { Users, TreePine, Home, Plus } from "lucide-react";
+import { Users, TreePine, Home, Plus, Heart } from "lucide-react";
 
 import { cn } from "~/lib/utils";
 
 const navigation = [
   { name: "Home", href: "/", icon: Home },
   { name: "People", href: "/people", icon: Users },
+  { name: "Relationships", href: "/relationships", icon: Heart },
   { name: "Family Tree", href: "/tree", icon: TreePine },
   { name: "Add Person", href: "/people/new", icon: Plus },
 ];
