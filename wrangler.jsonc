@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "nara-vite-react-boilerplate",
+  "name": "nara-familytree-react-ts",
   "compatibility_date": "2025-04-09",
   "compatibility_flags": ["nodejs_compat"],
   "main": "./workers/app.ts",
