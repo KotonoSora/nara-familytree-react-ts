@@ -1,49 +1,17 @@
 import type { Route } from "./+types/_index";
 
-import { PageContext } from "~/features/landing-page/context/page-context";
-import { ContentPage } from "~/features/landing-page/page";
-import { getPageInformation } from "~/features/landing-page/utils/get-page-information";
-import { getShowcases } from "~/features/landing-page/utils/get-showcases";
-
-export async function loader({ context }: Route.LoaderArgs) {
-  try {
-    const {
-      cloudflare: { env },
-      db,
-    } = context;
-
-    const { title, description, githubRepository, commercialLink } =
-      await getPageInformation({ ...env } as any);
-    const showcases = await getShowcases(db);
-
-    return {
-      title,
-      description,
-      githubRepository,
-      commercialLink,
-      showcases,
-    } as PageInformation;
-  } catch (error) {
-    console.error(error);
-    return null;
-  }
-}
-
-export function meta({ data }: Route.MetaArgs) {
-  if (!data) return null;
-
+export function meta({}: Route.MetaArgs) {
   return [
-    { title: data.title },
-    { name: "description", content: data.description },
+    { title: "Home" },
+    { name: "description", content: "Welcome to the home page" },
   ];
 }
 
-export default function Page({ loaderData }: Route.ComponentProps) {
-  if (!loaderData) return null;
-
+export default function Page({}: Route.ComponentProps) {
   return (
-    <PageContext.Provider value={loaderData}>
-      <ContentPage />
-    </PageContext.Provider>
+    <div>
+      <h1>Home</h1>
+      <p>Welcome to the home page!</p>
+    </div>
   );
 }

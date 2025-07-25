@@ -28,9 +28,6 @@ app.onError((err, c) => {
   return c.json({ error: "Internal Server Error" }, 500);
 });
 
-// Not found handler
-app.notFound((c) => c.json({ error: "Not Found" }, 404));
-
 // Routes
 app.get("/", (c) => {
   const env = import.meta.env;
@@ -40,5 +37,15 @@ app.get("/", (c) => {
 app.get("/hello-world", (c) => c.json({ message: "Hello, World!" }));
 
 app.get("/health", (c) => c.json({ status: "ok" }));
+
+// Example route to test error handling
+if (import.meta.env.NODE_ENV === "development") {
+  app.get("/error", () => {
+    throw new HTTPException(400, { message: "This is a test error" });
+  });
+}
+
+// Throw not found response
+app.all("*", async (c) => c.notFound());
 
 export default app;
