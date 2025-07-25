@@ -18,6 +18,7 @@ import {
 import type { Route } from "./+types/root";
 
 import { Toaster } from "~/components/ui/sonner";
+import { Navigation } from "~/components/navigation";
 import { themeSessionResolver } from "~/sessions.server";
 
 import "~/app.css";
@@ -76,7 +77,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
       specifiedTheme={data?.theme as Theme}
       themeAction="/action/set-theme"
     >
-      <InnerLayout ssrTheme={Boolean(data?.theme)}>{children}</InnerLayout>
+      <InnerLayout ssrTheme={Boolean(data?.theme)}>
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+          <Navigation />
+          <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            {children}
+          </main>
+        </div>
+      </InnerLayout>
     </ThemeProvider>
   );
 }

@@ -6,6 +6,8 @@ import type { DrizzleD1Database } from "drizzle-orm/d1";
 
 import * as schema from "~/database/schema";
 import apiRoute from "~/workers/api/common";
+import peopleRoute from "~/workers/api/people";
+import relationshipsRoute from "~/workers/api/relationships";
 
 declare module "react-router" {
   export interface AppLoadContext {
@@ -30,6 +32,8 @@ app.notFound((c) => c.json({ error: "Not Found" }, 404));
 
 // Routes
 app.route("/api", apiRoute);
+app.route("/api/people", peopleRoute);
+app.route("/api/relationships", relationshipsRoute);
 
 app.all("*", async (c) => {
   const request = c.req.raw; // Get the raw Request object
