@@ -4,6 +4,9 @@ import { HTTPException } from "hono/http-exception";
 import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
 
+import familyMembersRoute from "./family-members";
+import relationshipsRoute from "./relationships";
+
 const app = new Hono<{ Bindings: Env }>();
 
 // Middleware
@@ -37,6 +40,10 @@ app.get("/", (c) => {
 app.get("/hello-world", (c) => c.json({ message: "Hello, World!" }));
 
 app.get("/health", (c) => c.json({ status: "ok" }));
+
+// Family tree API routes
+app.route("/family-members", familyMembersRoute);
+app.route("/relationships", relationshipsRoute);
 
 // Example route to test error handling
 if (import.meta.env.NODE_ENV === "development") {

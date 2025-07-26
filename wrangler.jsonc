@@ -5,6 +5,7 @@
   "compatibility_flags": ["nodejs_compat"],
   "main": "./workers/app.ts",
   "preview_urls": false,
+  "send_metrics": false,
   "d1_databases": [
     {
       "binding": "DB",

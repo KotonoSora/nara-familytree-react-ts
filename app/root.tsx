@@ -58,7 +58,7 @@ function InnerLayout({
         <PreventFlashOnWrongTheme ssrTheme={ssrTheme} />
         <Links />
       </head>
-      <body>
+      <body className="bg-gray-50 dark:bg-gray-900 min-h-screen">
         {children}
         <ScrollRestoration />
         <Scripts />
