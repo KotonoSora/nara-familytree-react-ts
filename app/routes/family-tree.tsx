@@ -83,7 +83,7 @@ export default function FamilyTreePage({ loaderData }: Route.ComponentProps) {
                 View All Members
               </a>
               <a
-                href="/family-tree/visualization"
+                href="/tree-visualization"
                 className="block w-full bg-green-600 hover:bg-green-700 text-white text-center py-2 px-4 rounded-md transition-colors"
               >
                 View Tree Visualization
