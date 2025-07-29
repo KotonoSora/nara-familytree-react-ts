@@ -28,6 +28,49 @@ body {
   }
 }
 
+/* Family Tree Specific Styles */
+@layer components {
+  .family-tree-canvas {
+    @apply relative h-full w-full overflow-hidden select-none;
+  }
+
+  .family-tree-node {
+    @apply transition-all duration-200 ease-in-out;
+    @apply hover:scale-105 hover:shadow-lg;
+  }
+
+  .family-tree-node-selected {
+    @apply ring-primary shadow-lg ring-2 ring-offset-2;
+  }
+
+  .family-tree-connection {
+    @apply transition-all duration-200 ease-in-out;
+  }
+
+  .family-tree-connection-highlight {
+    @apply stroke-primary drop-shadow-sm;
+  }
+}
+
+/* Gender-based styling */
+@layer utilities {
+  .gender-male {
+    @apply border-l-blue-400 bg-gradient-to-r from-blue-50 to-white;
+  }
+
+  .gender-female {
+    @apply border-l-pink-400 bg-gradient-to-r from-pink-50 to-white;
+  }
+
+  .gender-other {
+    @apply border-l-purple-400 bg-gradient-to-r from-purple-50 to-white;
+  }
+
+  .gender-unknown {
+    @apply border-l-gray-400 bg-gradient-to-r from-gray-50 to-white;
+  }
+}
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
